@@ -94,6 +94,17 @@ async def on_message(message):
         
         await message.channel.send(embed=embed)
 
+# --- Track deleted messages ---
+@bot.event
+async def on_message_delete(message):
+    if message.author.bot:
+        return
+    
+    lb_channel_id = bot.config.get("leaderboard_channel_id")
+    if lb_channel_id and message.channel.id == lb_channel_id:
+        if bot.message_counts[lb_channel_id][message.author.id] > 0:
+            bot.message_counts[lb_channel_id][message.author.id] -= 1
+
 # Slash command to configure leaderboard channel
 @bot.tree.command(name="config_leaderboard", description="Set the channel for message leaderboard tracking")
 @app_commands.checks.has_permissions(administrator=True)
@@ -108,4 +119,5 @@ if TOKEN:
     bot.run(TOKEN)
 else:
     print("ERROR: DISCORD_TOKEN not found in environment variables!")
+
 
