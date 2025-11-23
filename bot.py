@@ -296,64 +296,6 @@ async def on_message(message):
     parts = message.content.split(maxsplit=1)
     command = parts[0].lower()
     args = parts[1] if len(parts) > 1 else ""
-    
-    if command == "$add":
-        if not has_permission(message.author, message.channel.id):
-            await message.channel.send("❌ Only the claiming middleman or authorized roles can use this command.")
-            return
-        
-        if not message.mentions:
-            await message.channel.send("❌ Please mention a user to add.")
-            return
-        
-        user_to_add = message.mentions[0]
-        try:
-            await message.channel.set_permissions(user_to_add, read_messages=True, send_messages=True)
-            await message.channel.send(f"✅ Added {user_to_add.mention} to the ticket.")
-        except discord.Forbidden:
-            await message.channel.send("❌ I don't have permission to modify channel permissions.")
-    
-    elif command == "$remove":
-        if not has_permission(message.author, message.channel.id):
-            await message.channel.send("❌ Only the claiming middleman or authorized roles can use this command.")
-            return
-        
-        if not message.mentions:
-            await message.channel.send("❌ Please mention a user to remove.")
-            return
-        
-        user_to_remove = message.mentions[0]
-        try:
-            await message.channel.set_permissions(user_to_remove, overwrite=None)
-            await message.channel.send(f"✅ Removed {user_to_remove.mention} from the ticket.")
-        except discord.Forbidden:
-            await message.channel.send("❌ I don't have permission to modify channel permissions.")
-    
-    elif command == "$unclaim":
-        if message.channel.id not in bot.active_tickets:
-            await message.channel.send("❌ This is not a ticket channel.")
-            return
-        
-        if not has_permission(message.author, message.channel.id):
-            await message.channel.send("❌ Only the claiming middleman or authorized roles can use this command.")
-            return
-        
-        ticket_data = bot.active_tickets[message.channel.id]
-        
-        if not ticket_data['claimer']:
-            await message.channel.send("❌ This ticket has not been claimed yet.")
-            return
-        
-        ticket_data['claimer'] = None
-        
-        try:
-            ticket_message = await message.channel.fetch_message(ticket_data['message_id'])
-            embed = ticket_message.embeds[0]
-            
-            for i, field in enumerate(embed.fields):
-                if field.name == "Status":
-                    embed.set_field_at(i, name="Status", value="⏳ Waiting for Middleman", inline=False)
-                    break
             
             claim_button = Button(label="Claim", style=discord.ButtonStyle.green, custom_id="claim_ticket")
             view = View(timeout=None)
@@ -364,81 +306,7 @@ async def on_message(message):
             await message.channel.send("✅ Ticket has been unclaimed. The claim button is now active again.")
             
         except Exception as e:
-            await message.channel.send(f"❌ Error unclaiming ticket: {str(e)}")
-    
-    elif command == "$rename":
-        if not has_permission(message.author, message.channel.id):
-            await message.channel.send("❌ Only the claiming middleman or authorized roles can use this command.")
-            return
-        
-        if not args:
-            await message.channel.send("❌ Please provide a new name. Usage: `$rename <name>`")
-            return
-        
-        new_name = f"mm-{args.strip()}"
-        
-        try:
-            await message.channel.edit(name=new_name)
-            await message.channel.send(f"✅ Channel renamed to `{new_name}`")
-        except discord.Forbidden:
-            await message.channel.send("❌ I don't have permission to rename channels.")
-    
-    elif command == "$close":
-        if message.channel.id not in bot.active_tickets:
-            await message.channel.send("❌ This is not a ticket channel.")
-            return
-        
-        ticket_data = bot.active_tickets[message.channel.id]
-        
-        if bot.config.get('log_channel_id'):
-            log_channel = bot.get_channel(bot.config['log_channel_id'])
-            if log_channel:
-                requester = message.guild.get_member(ticket_data['requester'])
-                other_trader = message.guild.get_member(ticket_data['other_trader'])
-                claimer = message.guild.get_member(ticket_data['claimer']) if ticket_data['claimer'] else None
-                
-                log_embed = discord.Embed(
-                    title="📋 Ticket Closed",
-                    description=f"**Channel:** {message.channel.name}",
-                    color=discord.Color.red(),
-                    timestamp=datetime.utcnow()
-                )
-                log_embed.add_field(name="Requester", value=requester.mention if requester else "Unknown", inline=True)
-                log_embed.add_field(name="Other Trader", value=other_trader.mention if other_trader else "Unknown", inline=True)
-                log_embed.add_field(name="Claimed By", value=claimer.mention if claimer else "Not Claimed", inline=True)
-                log_embed.add_field(name="Trade Description", value=ticket_data['trade_description'], inline=False)
-                log_embed.add_field(name="Closed By", value=message.author.mention, inline=True)
-                log_embed.add_field(name="Created At", value=ticket_data['created_at'], inline=True)
-                
-                try:
-                    await log_channel.send(embed=log_embed)
-                except:
-                    pass
-        
-        del bot.active_tickets[message.channel.id]
-        
-        await message.channel.send("🔒 This ticket will be deleted in 5 seconds...")
-        await asyncio.sleep(5)
-        
-        try:
-            await message.channel.delete()
-        except discord.Forbidden:
-            await message.channel.send("❌ I don't have permission to delete channels.")
-    
-    elif command == "$joinus":
-        joinus_msg = bot.config.get('joinus_message', '🎉 Join us today!')
-        
-        accept_button = Button(label="Accept", style=discord.ButtonStyle.green, custom_id="joinus_accept")
-        decline_button = Button(label="Decline", style=discord.ButtonStyle.red, custom_id="joinus_decline")
-        
-        view = View(timeout=None)
-        view.add_item(accept_button)
-        view.add_item(decline_button)
-        
-        accept_button.callback = joinus_accept_callback
-        decline_button.callback = joinus_decline_callback
-        
-        await message.channel.send(joinus_msg, view=view)
+            await message.channel.send(f"❌ Error unclaiming ticket: {str(e)}") 
     
     elif command == "$mminfosab":
         embed = discord.Embed(
