@@ -458,7 +458,7 @@ async def on_message(message):
         color=0xFFA500
     )
 
-    embed.set_image(url="https://media.discordapp.net/attachments/1418425610249834547/1424601221909446839/mminfo.png?ex=68fd9747&is=68fc45c7&hm=201fbf294c09b5e902e3694f0ccf1e8f67e10d92b6e99722faa8efff9ce93e75&format=webp&quality=lossless&")  # Replace with your actual image
+    embed.set_image(url="https://cdn.discordapp.com/attachments/1292876935214534799/1442083659992797184/Middeman_sign.jpg?ex=69242491&is=6922d311&hm=57634a35322b38a76383361a7d6ab5b556a0fc97797a956195398045e99f54c7&")  # Replace with your actual image
     await message.channel.send(embed=embed)
 
 
