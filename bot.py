@@ -440,19 +440,20 @@ async def on_message(message):
         
         await message.channel.send(joinus_msg, view=view)
     
-    elif command == "$mminfo":
+    elif command == "$mminfosab":
         embed = discord.Embed(
         title="Middleman Info & Explanation",
         description=(
             "ℹ️ **Middleman System Info**\n\n"
             "Our middleman system helps facilitate safe trades between users. Here's how it works:\n\n"
-            "**Example:** Trade is NFR Crow for Robux.\n\n"
+            "**Example:** Trade is a Brainrot for Brainrot.\n\n"
             "**Steps:**\n"
-            "1. Seller gives the NFR Crow to the middleman.\n"
-            "2. Middleman confirms and shows proof to buyer.\n"
-            "3. Buyer pays Robux to seller.\n"
-            "4. Seller confirms receipt.\n"
-            "5. Middleman gives NFR Crow to buyer."
+            "1. Log in with Account 1 (Player 1’s account) → take Player 1’s items.\n"
+            "2. Log in with Account 2 (Player 2’s account) → take Player 2’s items.\n"
+            "This part is called distribution and will only be done once I have the items from both players.\n"
+            "3. Switch back to Account 1 but join Player 2 → give Player 2 the items from Player 1.\n"
+            "4. Remove player 2 from the server since he alr got his stuff.\n"
+            "5. Join Player 1 again with Account 1 → give Player 1 the items taken from Player 2’s account.\n"
         ),
         color=0xFFA500
     )
