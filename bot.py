@@ -446,14 +446,14 @@ async def on_message(message):
         description=(
             "ℹ️ **Middleman System Info**\n\n"
             "Our middleman system helps facilitate safe trades between users. Here's how it works:\n\n"
-            "**Example:** Trade is a Brainrot for Brainrot.\n\n"
+            "**Example:** Trade is a Brainrot for Brainrot (trade between Larry and Harry) .\n\n"
             "**Steps:**\n"
-            "1. Log in with Account 1 (Player 1’s account) → take Player 1’s items.\n"
-            "2. Log in with Account 2 (Player 2’s account) → take Player 2’s items.\n"
+            "1. Log in with Account 1  → take Larry´s items.\n"
+            "2. Log in with Account 2 → take Harry´s items.\n"
             "This part is called distribution and will only be done once I have the items from both players.\n"
-            "3. Switch back to Account 1 but join Player 2 → give Player 2 the items from Player 1.\n"
-            "4. Remove player 2 from the server since he alr got his stuff.\n"
-            "5. Join Player 1 again with Account 1 → give Player 1 the items taken from Player 2’s account.\n"
+            "3. Switch back to Account 1 but join Harry → give Harry the items from Larry.\n"
+            "4. Remove player Harry from the server since he alr got his stuff.\n"
+            "5. Join Player Larry again with Account 2 → give Larry the items taken from Harry.\n"
         ),
         color=0xFFA500
     )
