@@ -1,8 +1,6 @@
 import discord
 from discord import app_commands
-import os
 import json
-from collections import defaultdict
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -13,14 +11,13 @@ class MiddlemanBot(discord.Client):
         super().__init__(intents=intents)
         self.tree = app_commands.CommandTree(self)
         self.load_config()
-        self.message_counts = defaultdict(lambda: defaultdict(int))  # {channel_id: {user_id: count}}
         
     def load_config(self):
         try:
             with open('config.json', 'r') as f:
                 self.config = json.load(f)
         except FileNotFoundError:
-            self.config = {"leaderboard_channel_id": None}
+            self.config = {}
             with open('config.json', 'w') as f:
                 json.dump(self.config, f, indent=4)
         
@@ -38,13 +35,8 @@ async def on_message(message):
     if message.author.bot:
         return
     
-    # Track messages only in the configured channel
-    lb_channel_id = bot.config.get("leaderboard_channel_id")
-    if lb_channel_id and message.channel.id == lb_channel_id:
-        bot.message_counts[lb_channel_id][message.author.id] += 1
-    
-    # --- mminfosab command ---
-    if message.content.lower().startswith("$mminfosab"):
+    # --- +mminfosab command ---
+    if message.content.lower().startswith("+mminfosab"):
         embed = discord.Embed(
             title="Middleman Info & Explanation",
             description=(
@@ -65,57 +57,5 @@ async def on_message(message):
             url="https://cdn.discordapp.com/attachments/1292876935214534799/1442083659992797184/Middeman_sign.jpg"
         )
         await message.channel.send(embed=embed)
-    
-    # --- Leaderboard command ---
-    if message.content.lower().startswith("$leaderboard"):
-        lb_channel_id = bot.config.get("leaderboard_channel_id")
-        if not lb_channel_id:
-            await message.channel.send("❌ Leaderboard channel not configured yet.")
-            return
-        
-        counts = bot.message_counts[lb_channel_id]
-        if not counts:
-            await message.channel.send("📊 No messages tracked yet.")
-            return
-        
-        # Sort users by message count
-        sorted_counts = sorted(counts.items(), key=lambda x: x[1], reverse=True)[:10]
-        
-        embed = discord.Embed(
-            title="🏆 Message Leaderboard",
-            description=f"Top message senders in <#{lb_channel_id}>",
-            color=discord.Color.gold()
-        )
-        
-        for rank, (user_id, count) in enumerate(sorted_counts, start=1):
-            user = message.guild.get_member(user_id)
-            name = user.display_name if user else f"User({user_id})"
-            embed.add_field(name=f"{rank}. {name}", value=f"{count} messages", inline=False)
-        
-        await message.channel.send(embed=embed)
 
-# --- Track deleted messages ---
-@bot.event
-async def on_message_delete(message):
-    if message.author.bot:
-        return
-    
-    lb_channel_id = bot.config.get("leaderboard_channel_id")
-    if lb_channel_id and message.channel.id == lb_channel_id:
-        if bot.message_counts[lb_channel_id][message.author.id] > 0:
-            bot.message_counts[lb_channel_id][message.author.id] -= 1
-
-# Slash command to configure leaderboard channel
-@bot.tree.command(name="config_leaderboard", description="Set the channel for message leaderboard tracking")
-@app_commands.checks.has_permissions(administrator=True)
-async def config_leaderboard(interaction: discord.Interaction, channel: discord.TextChannel):
-    bot.config["leaderboard_channel_id"] = channel.id
-    with open('config.json', 'w') as f:
-        json.dump(bot.config, f, indent=4)
-    await interaction.response.send_message(f"✅ Leaderboard channel set to {channel.mention}", ephemeral=True)
-
-TOKEN = os.getenv('DISCORD_TOKEN')
-if TOKEN:
-    bot.run(TOKEN)
-else:
-    print("ERROR: DISCORD_TOKEN not found in environment variables!")
+bot.run("YOUR_TOKEN_HERE")
