@@ -1,6 +1,7 @@
 import discord
 from discord import app_commands
 import json
+import os  # <--- needed for os.getenv
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -58,9 +59,10 @@ async def on_message(message):
         )
         await message.channel.send(embed=embed)
 
+# Read token from environment variable DISCORD_TOKEN
 TOKEN = os.getenv('DISCORD_TOKEN')
 if not TOKEN:
     print("ERROR: DISCORD_TOKEN not found in environment variables!")
-    print("Please add your Discord bot token to the Secrets tab.")
+    print("Please add your Discord bot token to the Secrets/Variables as DISCORD_TOKEN.")
 else:
     bot.run(TOKEN)
