@@ -58,4 +58,9 @@ async def on_message(message):
         )
         await message.channel.send(embed=embed)
 
-bot.run("YOUR_TOKEN_HERE")
+TOKEN = os.getenv('DISCORD_TOKEN')
+if not TOKEN:
+    print("ERROR: DISCORD_TOKEN not found in environment variables!")
+    print("Please add your Discord bot token to the Secrets tab.")
+else:
+    bot.run(TOKEN)
